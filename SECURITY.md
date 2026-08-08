@@ -2,4 +2,4 @@
 
 ## Reporting a Vulnerability
 
-Please email `disclosures@daily.co`.
+Please email `doggalasrinath@gmail.com`.
