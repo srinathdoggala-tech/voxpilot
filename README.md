@@ -1,11 +1,12 @@
-# VoxPilot AI — Advanced Real-Time Voice Agent Platform
+# VoxPilot AI — Real-Time Voice Agent Platform
 
-![VoxPilot AI Architecture](https://img.shields.io/badge/VoxPilot-Advanced%20Voice%20AI-6366F1?style=for-the-badge)
+![VoxPilot AI Architecture](https://img.shields.io/badge/VoxPilot-Voice%20AI%20Platform-6366F1?style=for-the-badge)
+![Author](https://img.shields.io/badge/Author-Srinath%20Doggala-black?style=for-the-badge&logo=github)
 ![Python](https://img.shields.io/badge/Python-3.12+-blue?style=for-the-badge&logo=python)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.100+-009688?style=for-the-badge&logo=fastapi)
 ![License](https://img.shields.io/badge/License-BSD--2--Clause-green?style=for-the-badge)
 
-**VoxPilot AI** is an advanced, production-grade real-time Voice AI Agent platform. Built with adaptive multi-model routing, turn state classification (backchannels, hesitations, overlaps), user sentiment detection, personal long-term memory, background long-running task scheduling, risk-classified Human-in-the-Loop tool execution, developer session replay, real-time cost estimation, multi-model evaluation arena, and comprehensive observability.
+**VoxPilot AI** is an advanced, production-grade real-time Voice AI Agent platform designed and engineered by **Srinath Doggala** ([@srinathdoggala-tech](https://github.com/srinathdoggala-tech)). Built with adaptive multi-model routing, turn state classification (backchannels, hesitations, overlaps), user sentiment detection, personal long-term memory, background long-running task scheduling, risk-classified Human-in-the-Loop tool execution, developer session replay, real-time cost tracking, multi-model evaluation arena, and comprehensive observability.
 
 ---
 

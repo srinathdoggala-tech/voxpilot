@@ -3,9 +3,10 @@ requires = ["setuptools>=64", "setuptools_scm>=8"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "pipecat-ai"
-dynamic = ["version"]
-description = "An open source framework for voice (and multimodal) assistants"
+name = "voxpilot-ai"
+version = "1.0.0"
+description = "VoxPilot AI — Advanced Real-Time Voice Agent Platform by Srinath Doggala"
+authors = [{name = "Srinath Doggala"}]
 license = "BSD-2-Clause"
 license-files = ["LICENSE"]
 readme = "README.md"

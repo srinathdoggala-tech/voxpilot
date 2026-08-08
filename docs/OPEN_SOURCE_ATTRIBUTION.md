@@ -2,7 +2,7 @@
 
 ## 1. Compliance Statement
 
-VoxPilot AI is an independent Voice AI platform built on top of open-source software libraries, including **Pipecat** (`BSD-2-Clause`).
+VoxPilot AI is an independent Voice AI platform designed and authored by **Srinath Doggala** ([@srinathdoggala-tech](https://github.com/srinathdoggala-tech)), built on top of open-source software libraries including **Pipecat** (`BSD-2-Clause`).
 
 All open-source software dependencies used in VoxPilot AI are used in strict compliance with their respective licenses. Copyright notices, license texts, and contributor attributions from upstream projects are preserved in full.
 

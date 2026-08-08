@@ -3,6 +3,9 @@
 ## Project Title
 **VoxPilot AI — Advanced Real-Time Voice Agent Platform**
 
+## Author / Lead Engineer
+**Srinath Doggala** ([srinathdoggala-tech](https://github.com/srinathdoggala-tech))
+
 ## Category
 **Real-Time Multimodal Voice AI / AI Systems Engineering / Agentic Platforms**
 
