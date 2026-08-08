@@ -67,7 +67,7 @@ class AdaptiveModelRouter:
                 reason = f"Fallback from unhealthy '{provider_name}' -> OpenAI."
             else:
                 selected_key = "fallback"
-                reason = f"All external providers degraded. Routed to local Mock provider."
+                reason = "All external providers degraded. Routed to local Mock provider."
             spec = self.model_catalog[selected_key]
 
         decision = ModelRoutingDecision(

@@ -1,7 +1,6 @@
 """RAG Knowledge Base Subsystem with Intelligent Retrieval Decision Engine."""
 
 import time
-import uuid
 from pydantic import BaseModel, Field
 from voxpilot.providers.embeddings.base import EmbeddingProvider
 from voxpilot.providers.vector_store.base import VectorStore, VectorDocument, VectorSearchResult

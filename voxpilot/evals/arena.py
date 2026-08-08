@@ -1,9 +1,8 @@
 """Model Evaluation Arena — Multi-model side-by-side performance and quality benchmark runner."""
 
-import asyncio
 from pydantic import BaseModel
 from voxpilot.evals.scenarios import BENCHMARK_SCENARIOS
-from voxpilot.evals.harness import EvaluationHarness, ScenarioEvalReport
+from voxpilot.evals.harness import EvaluationHarness
 
 
 class ModelArenaScore(BaseModel):

@@ -1,6 +1,5 @@
 """Integration tests for VoxPilot FastAPI REST and WebSocket API endpoints."""
 
-import pytest
 from fastapi.testclient import TestClient
 from voxpilot.api.server import app
 

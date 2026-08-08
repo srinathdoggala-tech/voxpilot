@@ -1,6 +1,6 @@
 """Cost Engine — Calculates real-time estimated AI cost across LLM, STT, TTS, and embeddings."""
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 
 class CostBreakdown(BaseModel):

@@ -1,6 +1,5 @@
 """Automated AI Evaluation Harness for VoxPilot AI Platform."""
 
-import asyncio
 import logging
 import uuid
 from pydantic import BaseModel

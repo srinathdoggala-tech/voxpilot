@@ -1,7 +1,6 @@
 """Specialized Domain Agents for VoxPilot AI Multi-Agent Architecture."""
 
 from abc import ABC, abstractmethod
-from typing import Any
 from pydantic import BaseModel
 from voxpilot.providers.llm.base import LLMProvider, LLMMessage, LLMChunk
 from voxpilot.tools.registry import tool_registry, ToolExecutionResult

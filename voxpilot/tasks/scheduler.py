@@ -1,6 +1,5 @@
 """Background Task Scheduler — Session-surviving background tasks and execution scheduling."""
 
-import asyncio
 import time
 import uuid
 import logging

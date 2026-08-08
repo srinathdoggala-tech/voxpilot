@@ -1,6 +1,5 @@
 """Unit tests for conversation session memory management."""
 
-import pytest
 from voxpilot.memory.session_memory import SessionMemory
 
 

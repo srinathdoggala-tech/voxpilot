@@ -97,7 +97,7 @@ class VoxPilotPipeline:
         stt_latency = self.latency_observer.on_stt_complete()
 
         # 1. Advanced Turn Classification & State Analysis
-        turn_event = self.turn_manager.classify_speech_input(user_text, is_assistant_speaking=False)
+        self.turn_manager.classify_speech_input(user_text, is_assistant_speaking=False)
         current_state = self.state_engine.update_state(user_text, was_interrupted=self.interruption_manager.is_interrupted)
 
         session_replay_store.record_event(self.session_id, "USER_SPEECH", metadata={"text": user_text, "state": current_state})
