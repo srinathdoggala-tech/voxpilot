@@ -655,4 +655,4 @@ This helps ensure your integration remains compatible and your users have clear 
 
 Join our Discord community at https://discord.gg/pipecat and post in the `#community-integrations` channel for guidance and support.
 
-For additional questions, you can also reach out to us at pipecat-ai@daily.co.
+For additional questions, you can also reach out to us at srinathdoggala@tech.com.

@@ -1,16 +1,16 @@
-## Contributing to Pipecat
+## Contributing to VoxPilot AI
 
 **Want to add a new service integration?**
 We encourage community-maintained integrations! Please see our [Community Integration Guide](COMMUNITY_INTEGRATIONS.md) for the process and requirements.
 
-**Want to contribute to Pipecat core?**
+**Want to contribute to VoxPilot AI core?**
 We welcome contributions of all kinds! Your help is appreciated. Follow these steps to get involved:
 
-1. **Fork this repository**: Start by forking the Pipecat Documentation repository to your GitHub account.
+1. **Fork this repository**: Start by forking the VoxPilot AI repository (`https://github.com/srinathdoggala-tech/voxpilot`) to your GitHub account.
 
 2. **Clone the repository**: Clone your forked repository to your local machine.
    ```bash
-   git clone https://github.com/your-username/pipecat
+   git clone https://github.com/srinathdoggala-tech/voxpilot.git
    ```
 3. **Create a branch**: For your contribution, create a new branch.
    ```bash
@@ -453,7 +453,7 @@ representative at an online or offline event.
 ## Enforcement
 
 Instances of abusive, harassing, or otherwise unacceptable behavior may be
-reported to the community leaders responsible for enforcement at pipecat-ai@daily.co.
+reported to the project maintainers responsible for enforcement at srinathdoggala@tech.com.
 All complaints will be reviewed and investigated promptly and fairly.
 
 All community leaders are obligated to respect the privacy and security of the
