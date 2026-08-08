@@ -57,11 +57,11 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://pipecat.ai"
-Documentation = "https://docs.pipecat.ai/"
-Source = "https://github.com/pipecat-ai/pipecat"
-Issues = "https://github.com/pipecat-ai/pipecat/issues"
-Changelog = "https://github.com/pipecat-ai/pipecat/blob/main/CHANGELOG.md"
+Homepage = "https://github.com/srinathdoggala-tech/voxpilot"
+Documentation = "https://github.com/srinathdoggala-tech/voxpilot#readme"
+Source = "https://github.com/srinathdoggala-tech/voxpilot"
+Issues = "https://github.com/srinathdoggala-tech/voxpilot/issues"
+Changelog = "https://github.com/srinathdoggala-tech/voxpilot/blob/main/CHANGELOG.md"
 
 [project.scripts]
 # The Pipecat CLI ships with pipecat-ai, but its dependencies are optional (the `cli`
