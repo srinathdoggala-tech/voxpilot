@@ -1,0 +1,36 @@
+# Multi-stage production Python 3.11 Dockerfile for VoxPilot AI Backend
+FROM python:3.11-slim as builder
+
+WORKDIR /app
+
+# Install system build dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    curl \
+    git \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install uv package manager
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /bin/uv
+
+# Copy project specification files
+COPY pyproject.toml uv.lock ./
+COPY src/ ./src/
+COPY voxpilot/ ./voxpilot/
+
+# Sync dependencies using uv
+RUN uv sync --frozen --no-dev --no-editable
+
+# Production runner image
+FROM python:3.11-slim as runner
+
+WORKDIR /app
+
+ENV PYTHONUNBUFFERED=1 \
+    PATH="/app/.venv/bin:$PATH"
+
+COPY --from=builder /app /app
+
+EXPOSE 8000
+
+CMD ["python", "-m", "voxpilot.api.server"]
