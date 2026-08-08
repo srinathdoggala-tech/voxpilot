@@ -224,7 +224,7 @@ where = ["src"]
 [tool.pytest.ini_options]
 addopts = "--verbose"
 testpaths = ["tests"]
-pythonpath = ["src"]
+pythonpath = ["src", "."]
 asyncio_default_fixture_loop_scope = "function"
 filterwarnings = [
     "ignore:'audioop' is deprecated:DeprecationWarning",
@@ -254,6 +254,7 @@ ignore = [
 "tests/**/*.py" = ["D"]
 "scripts/**/*.py" = ["D"]
 "docs/**/*.py" = ["D"]
+"voxpilot/**/*.py" = ["D"]
 # Skip D104 (missing docstring in public package) for __init__.py files
 "**/__init__.py" = ["D104"]
 # Skip specific rules for generated protobuf files
