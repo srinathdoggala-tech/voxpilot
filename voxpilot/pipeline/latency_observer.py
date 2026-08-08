@@ -38,7 +38,7 @@ class LatencyObserver:
             return (self._llm_first_token_time - self._llm_start_time) * 1000.0
         return 0.0
 
-    def on_tts_first_audio((self) -> float:
+    def on_tts_first_audio(self) -> float:
         """Record TTS first audio chunk timestamp and calculate Time-To-First-Audio (TTFA) in ms."""
         self._tts_first_audio_time = time.perf_counter()
         if self._llm_first_token_time > 0:

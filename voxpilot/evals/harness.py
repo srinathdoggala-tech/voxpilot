@@ -88,7 +88,7 @@ class EvaluationHarness:
             details=" | ".join(details_list) if details_list else "Scenario benchmark passed clean."
         )
 
-    async def run_full_suite((self) -> SuiteEvalReport:
+    async def run_full_suite(self) -> SuiteEvalReport:
         """Run all benchmark scenarios and generate aggregate evaluation suite report."""
         reports: list[ScenarioEvalReport] = []
         for scenario in BENCHMARK_SCENARIOS:

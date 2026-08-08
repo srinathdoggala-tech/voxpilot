@@ -61,6 +61,6 @@ class AdvancedTurnManager:
         self._last_speech_timestamp = now
         return TurnEvent(state="USER_STOPPED_SPEAKING", transcript_snippet=transcript)
 
-    def check_silence_timeout(() -> bool:
+    def check_silence_timeout(self) -> bool:
         """Check if silence window exceeds silence timeout threshold."""
         return (time.time() - self._last_speech_timestamp) > self.silence_timeout_seconds
