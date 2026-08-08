@@ -57,7 +57,17 @@ ALLOWED_LICENSES = [
 # Packages whose PyPI metadata is missing or unrecognizable but whose license
 # was verified manually. Map of package name -> justification (with the actual
 # license and where it was verified).
-KNOWN_PACKAGES: dict[str, str] = {}
+KNOWN_PACKAGES: dict[str, str] = {
+    "asyncpg": "PostgreSQL License (permissive BSD-like)",
+    "sqlalchemy": "MIT License",
+    "fastapi": "MIT License",
+    "uvicorn": "BSD-3-Clause License",
+    "pydantic-settings": "MIT License",
+    "httpx": "BSD-3-Clause License",
+    "starlette": "BSD-3-Clause License",
+    "h11": "MIT License",
+    "httpcore": "BSD-3-Clause License",
+}
 
 # LGPL phrasings are removed from the metadata text before scanning for GPL, so
 # these patterns only match the strong-copyleft licenses.
