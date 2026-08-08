@@ -17,7 +17,7 @@ class InterruptionManager:
         """Register active downstream LLM/TTS generation task for potential interruption cancellation."""
         self._active_generation_task = task
 
-    def handle_interruption((self) -> None:
+    def handle_interruption(self) -> None:
         """Trigger instant barge-in cancellation."""
         self.is_interrupted = True
         logger.info("User barge-in detected! Triggering generation cancellation.")

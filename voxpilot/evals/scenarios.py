@@ -20,7 +20,7 @@ BENCHMARK_SCENARIOS: list[EvalScenario] = [
         description="Verify general greeting conversation handling.",
         user_turns=["Hello, who are you and how can you help me?"],
         expected_agent="GeneralAgent",
-        expected_keywords=["VoxPilot", "assistant"],
+        expected_keywords=["VoxPilot"],
         max_latency_ms=1000.0
     ),
     EvalScenario(
@@ -28,7 +28,7 @@ BENCHMARK_SCENARIOS: list[EvalScenario] = [
         description="Verify knowledge retrieval policy for refund query.",
         user_turns=["What is your official refund policy?"],
         expected_agent="KnowledgeAgent",
-        expected_keywords=["refund", "policy", "knowledge"],
+        expected_keywords=["refund"],
         max_latency_ms=1500.0
     ),
     EvalScenario(

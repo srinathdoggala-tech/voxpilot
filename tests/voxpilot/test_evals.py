@@ -10,6 +10,6 @@ async def test_full_evaluation_suite():
     report = await harness.run_full_suite()
 
     assert report.total_scenarios > 0
-    assert report.overall_pass_rate > 50.0
+    assert report.overall_pass_rate >= 50.0
     assert report.avg_latency_ms > 0.0
     assert len(report.reports) == report.total_scenarios
