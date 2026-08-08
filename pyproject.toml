@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "voxpilot-ai"
 version = "1.0.0"
 description = "VoxPilot AI — Advanced Real-Time Voice Agent Platform by Srinath Doggala"
-authors = [{name = "Srinath Doggala"}]
+authors = [{name = "Srinath Doggala", email = "doggalasrinath@gmail.com"}]
 license = "BSD-2-Clause"
 license-files = ["LICENSE"]
 readme = "README.md"
