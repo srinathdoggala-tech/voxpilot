@@ -1,97 +1,95 @@
-# VoxPilot AI — Enterprise Real-Time Voice Agent Platform
+# VoxPilot AI — Advanced Real-Time Voice Agent Platform
 
-![VoxPilot AI Architecture](https://img.shields.io/badge/VoxPilot-Voice%20AI-6366F1?style=for-the-badge)
-![Python](https://img.shields.io/badge/Python-3.11-blue?style=for-the-badge&logo=python)
+![VoxPilot AI Architecture](https://img.shields.io/badge/VoxPilot-Advanced%20Voice%20AI-6366F1?style=for-the-badge)
+![Python](https://img.shields.io/badge/Python-3.12+-blue?style=for-the-badge&logo=python)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.100+-009688?style=for-the-badge&logo=fastapi)
 ![License](https://img.shields.io/badge/License-BSD--2--Clause-green?style=for-the-badge)
 
-**VoxPilot AI** is a production-grade, real-time Voice AI Agent platform engineered for low-latency, high-reliability voice interactions. Built with modular provider abstractions, multi-agent dispatching, dynamic RAG knowledge retrieval, real-time barge-in actuation, sub-millisecond latency tracking, circuit-breaker reliability, automated AI evaluations, and a premium web interface.
+**VoxPilot AI** is an advanced, production-grade real-time Voice AI Agent platform. Built with adaptive multi-model routing, turn state classification (backchannels, hesitations, overlaps), user sentiment detection, long-term personal memory, background long-running task scheduling, risk-classified Human-in-the-Loop tool execution, developer session replay, real-time cost estimation, multi-model evaluation arena, and comprehensive observability.
 
 ---
 
 ## 💡 Legal & Open Source Attribution Notice
 
-VoxPilot AI is an **original application platform** engineered on top of open-source real-time voice orchestration technologies (leveraging **Pipecat** under the `BSD-2-Clause` license as a core dependency).
+VoxPilot AI is an **original application platform** built on top of open-source real-time voice orchestration technologies (leveraging **Pipecat** under the `BSD-2-Clause` license as a core infrastructure dependency).
 
 - Upstream Pipecat code, license notices, and author attributions are strictly preserved in full compliance with the BSD-2-Clause license.
-- All application level features (Multi-Agent Routing, Provider Abstraction Layer, Dynamic RAG Engine, Safe Tool Registry, Interruption Manager, Latency Observer, AI Evaluation Harness, Web Studio UI, and Docker deployment) represent original platform engineering.
+- All application-level features (Adaptive Model Router, Advanced Turn Manager, Conversational State Engine, Personal Memory Engine, Task Scheduler, Risk Classifier, Session Replay Store, Cost Engine, Model Arena, Web Studio UI, and Docker Compose deployment) represent original platform engineering.
 
 ---
 
-## 🚀 Key Features & Capabilities
+## 🚀 Advanced Capabilities
 
-- 🎤 **Real-Time Voice Streaming**: Bi-directional PCM16 WebSockets with VAD and turn detection.
-- ⚡ **Instant Barge-In / Interruption**: Aborts downstream LLM generation and flushes output audio buffers immediately when user speaks.
-- 🔌 **Pluggable Provider Abstractions**: Configuration-driven STT (Deepgram, Whisper, Mock), TTS (Cartesia, ElevenLabs, OpenAI, Mock), and LLM (OpenAI, Anthropic, Gemini, Mock).
-- 🧠 **Selective RAG Knowledge Base**: Agent-driven intent filter querying vector embeddings only when queries require external knowledge.
-- 🛠️ **Safe Tool Registry**: AST math evaluation, weather lookups, CRM customer queries, and task creation with JSON schema validation and timeouts.
-- 🔀 **Multi-Agent Architecture**: Voice Router Agent dispatching turns to specialized domain agents (`KnowledgeAgent`, `TaskAgent`, `SupportAgent`, `GeneralAgent`).
-- 🛡️ **Reliability Engineering**: Circuit breakers, exponential retries, and multi-tier provider failover (Primary LLM → Secondary LLM → Voice degradation).
-- 📊 **Sub-millisecond Observability**: Measures STT latency, LLM TTFT, TTS TTFA, tool execution duration, and total E2E turnaround.
-- 🧪 **AI Evaluation Subsystem**: Automated benchmark scenario runner evaluating relevance, groundedness, tool correctness, and latency.
-- 💻 **Premium Web Studio UI**: Dark glassmorphic interface with canvas wave visualizer, live transcript stream, developer metrics panel, and eval runner.
+- 🤖 **Adaptive Model Router**: Cost-, latency-, and complexity-aware LLM selection (`gpt-4o-mini`, `claude-3-5-sonnet`, `gemini-1.5-flash`) with provider health checks (`HEALTHY`, `DEGRADED`, `UNAVAILABLE`).
+- 🗣️ **Advanced Turn Manager**: Classifies turn states (`BACKCHANNEL`, `HESITATION`, `OVERLAP`, `SILENCE_TIMEOUT`) and filters ignored backchannels ("uh-huh") without interrupting assistant playback.
+- 🎭 **Conversational State Engine**: Derives user conversational sentiment (`CALM`, `CONFUSED`, `FRUSTRATED`, `ENGAGED`, `RUSHING`) to dynamically adapt response verbosity and confirmation rules.
+- 🧠 **Personal Long-Term Memory Store**: Captures user preferences, facts, and entities across sessions with confidence thresholds (`>=0.70`) to prevent memory pollution.
+- ⏱️ **Long-Running Task Scheduler**: Background task execution surviving individual voice sessions with retries, timeouts, and cancellation.
+- 🛡️ **Human-in-the-Loop Risk Classifier**: Categorizes tool execution risks into `LOW`, `MEDIUM`, `HIGH`, `BLOCKED` with explicit user confirmation for side-effects.
+- 📽️ **Developer Session Replay**: Granular event timeline recording (`USER_SPEECH`, `STT_FINAL`, `AGENT_DECISION`, `RAG_SEARCH`, `TOOL_CALL`, `LLM_FIRST_TOKEN`, `TTS_FIRST_AUDIO`, `USER_INTERRUPT`).
+- 💰 **Real-Time Cost Engine**: Tracks estimated costs for LLM tokens, STT duration, TTS characters, and embeddings.
+- ⚔️ **Model Evaluation Arena**: Side-by-side multi-model benchmark comparisons evaluating quality, latency, cost, and tool correctness.
+- 🧪 **Controlled Failure Testing**: Failure injection suite testing STT failure, TTS failure, LLM timeout, LLM 500, empty RAG, tool timeout, and network disconnects.
 
 ---
 
-## 🏗️ Architecture & Data Flow
+## 🏗️ System Architecture
 
 ```
-[ Web Audio Client / Next.js Studio UI ]
-                 │
-           WebSocket PCM16 / WebRTC Frame
-                 │
-                 ▼
-[ FastAPI Realtime Voice Endpoint (/api/v1/voice/ws) ]
-                 │
-                 ▼
-[ Silero VAD / Speech Boundary Detector ]
-                 │
-                 ▼
-[ STT Provider Abstraction (Deepgram / Whisper / Mock) ]
-                 │
-                 ▼
-[ Voice Router Agent ] ──► [ RAG Knowledge Engine ]
-                       ──► [ Safe Tool Registry ]
-                 │
-                 ▼
-[ Specialized Domain Agent Execution ]
-                 │
-                 ▼
-[ LLM Provider Abstraction (OpenAI / Anthropic / Gemini / Mock) ]
-                 │
-                 ▼
-[ TTS Provider Abstraction (Cartesia / ElevenLabs / OpenAI / Mock) ]
-                 │
-                 ▼
-[ WebSocket Streaming Output Engine ] ◄── [ Interruption Manager ]
+[ Web Studio UI / Advanced Developer Console ]
+                      │
+          WebSocket (PCM16 & Granular Event JSON)
+                      │
+                      ▼
+[ FastAPI Realtime Router (/api/v1/voice/ws) ]
+                      │
+                      ▼
+[ Advanced Turn Manager (Turn State, Backchannel, Overlap) ]
+                      │
+                      ▼
+[ Conversational State Engine (CALM, CONFUSED, FRUSTRATED, ENGAGED) ]
+                      │
+                      ▼
+[ Adaptive Model Router ] ──► [ Provider Health Monitor ]
+      ├── Complexity          ├── HEALTHY
+      ├── Latency Requirement ├── DEGRADED
+      └── Tool Needs          └── UNAVAILABLE
+                      │
+                      ▼
+[ Multi-Agent Supervisor ] ──► [ Personal Memory Engine (Long-Term/Summarizer) ]
+      ├── Knowledge Agent  ──► [ RAG Quality Engine (Recall, Precision) ]
+      ├── Task Agent       ──► [ Human-in-the-Loop & Risk Classifier ]
+      ├── Support Agent    ──► [ Long-Running Background Task Scheduler ]
+      └── General Agent
+                      │
+                      ▼
+[ Cost & Session Replay Telemetry Engine ]
 ```
 
 ---
 
-## 📦 Quickstart & Running Locally
+## 📦 Running Locally
 
 ### 1. Requirements
-- Python 3.11+
+- Python 3.11 or 3.12+
 - `uv` package manager
 
 ### 2. Environment Setup
-Copy template configuration:
 ```bash
 cp .env.example .env
 ```
-*(By default, `STT_PROVIDER=mock`, `TTS_PROVIDER=mock`, `LLM_PROVIDER=mock` allows running completely offline without API keys).*
 
-### 3. Run FastAPI Server
+### 3. Run Server
 ```bash
 uv run python -m voxpilot.api.server
 ```
-Open browser to `http://localhost:8000/app/` to launch the **VoxPilot Web Studio UI**.
+Open `http://localhost:8000/app/` in your browser to launch the **VoxPilot Web Studio UI**.
 
 ---
 
-## 🧪 Running Automated Tests
+## 🧪 Running Test Suite
 
-Run the full VoxPilot test suite covering providers, memory, RAG, tools, agents, reliability, pipeline, evals, and API endpoints:
+Run the full test suite including failure injection and advanced systems tests:
 
 ```bash
 uv run pytest tests/voxpilot/ -v
@@ -101,30 +99,27 @@ uv run pytest tests/voxpilot/ -v
 
 ## 🐳 Docker Deployment
 
-Run full stack with Docker Compose:
-
 ```bash
 docker-compose up --build -d
 ```
-
-Services:
-- **VoxPilot Backend API**: `http://localhost:8000`
-- **VoxPilot Web Studio UI**: `http://localhost`
-- **PostgreSQL Database**: `localhost:5432`
-- **Redis Cache**: `localhost:6379`
 
 ---
 
 ## 📚 Documentation Index
 
+- [Advanced Architecture Plan](docs/ADVANCED_ARCHITECTURE_PLAN.md)
 - [Architecture Overview](docs/ARCHITECTURE.md)
 - [Voice Pipeline & Interruption](docs/VOICE_PIPELINE.md)
+- [Multi-Agent Architecture](docs/AGENTS.md)
 - [RAG Knowledge Base](docs/RAG.md)
-- [Multi-Agent Routing](docs/AGENTS.md)
+- [Conversation Memory](docs/MEMORY.md)
+- [Safe Tools & Boundaries](docs/TOOLS.md)
+- [Reliability & Fallbacks](docs/RELIABILITY.md)
 - [Observability & Latency](docs/OBSERVABILITY.md)
 - [AI Evaluation Subsystem](docs/EVALUATION.md)
 - [Deployment Guide](docs/DEPLOYMENT.md)
-- [Security & Tool Boundaries](docs/SECURITY.md)
+- [Security Audit](docs/SECURITY_AUDIT.md)
+- [Interview Architecture Guide](docs/INTERVIEW_GUIDE.md)
 
 ---
 
