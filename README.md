@@ -7,12 +7,12 @@
 ![Author](https://img.shields.io/badge/Author-Srinath%20Doggala-black?style=for-the-badge&logo=github)
 ![Python](https://img.shields.io/badge/Python-3.12+-blue?style=for-the-badge&logo=python)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.100+-009688?style=for-the-badge&logo=fastapi)
+![Test Status](https://img.shields.io/badge/Tests-27%2F27%20Passed-10B981?style=for-the-badge)
 ![License](https://img.shields.io/badge/License-BSD--2--Clause-green?style=for-the-badge)
 
-**An enterprise real-time Voice AI Agent platform with adaptive multi-model routing,
-long-term memory, Human-in-the-Loop safety, and full-stack observability.**
+**A real-time Voice AI Agent platform with multi-agent orchestration, selective RAG, deterministic tool calling, reliability controls, and full-stack observability.**
 
-> 🚀 **Live Production App**: Try VoxPilot Web Studio live at **[https://voxpilot-two.vercel.app](https://voxpilot-two.vercel.app)**
+> 🚀 **Live Frontend Deployment**: Try VoxPilot Web Studio live at **[https://voxpilot-two.vercel.app](https://voxpilot-two.vercel.app)**
 
 *Designed and engineered by [Srinath Doggala](https://github.com/srinathdoggala-tech)*
 
@@ -20,26 +20,54 @@ long-term memory, Human-in-the-Loop safety, and full-stack observability.**
 
 ---
 
-## 🌟 What is VoxPilot?
+## 📊 Current Status & Verification
 
-**VoxPilot AI** is an advanced, production-grade real-time Voice AI Agent platform. It combines low-latency voice pipeline orchestration with intelligent multi-model routing, persistent user memory, real-time sentiment adaptation, selective RAG knowledge retrieval, and comprehensive observability — all accessible through a single full-duplex WebSocket interface.
+- **27/27 Automated Tests Passing**: Fully verified test suite covering pipeline, routing, RAG, tools, failure recovery, circuit breakers, and APIs (`uv run pytest tests/voxpilot/ -v`).
+- **Live Frontend**: Static Web Studio UI deployed on Vercel at [https://voxpilot-two.vercel.app](https://voxpilot-two.vercel.app).
+- **FastAPI Backend**: Fully containerized via [Dockerfile.backend](Dockerfile.backend) and configured for 1-click cloud deployment via [render.yaml](render.yaml).
+- **Active Demo Configuration**: Powered by real OpenAI providers (`gpt-4o-mini`, `whisper-1`, `tts-1`) with configurable fallbacks to mock providers when API keys are omitted.
+- **Persistence & Fallback**: Async PostgreSQL schema (`sessions`, `messages`, `tool_calls`, `retrieval_events`) with non-fatal initialization and automatic in-memory fallback.
+- **Full Telemetry**: Per-turn cost tracking, STT/TTFT/TTFA latency metrics, and timestamped session event replay API (`/api/v1/sessions/{id}/replay`).
+
+---
+
+## 🎥 End-to-End Demo Workflow
+
+```text
+  1. Open Web Studio ─────> 2. Start Session ─────> 3. Hold to Speak ─────> 4. Binary WS Stream
+(voxpilot-two.vercel.app)    (Connect Host)           (Mic PCM16 16kHz)       (Full-Duplex PCM)
+                                                                                  │
+  8. Audio Playback  <───── 7. TTS PCM Frames <───── 6. LLM Stream <───── 5. STT Transcript
+  (AudioBuffer Playback)      (OpenAI tts-1)          (gpt-4o-mini)          (Whisper / Deepgram)
+```
+
+1. **Launch Web Studio**: Open [https://voxpilot-two.vercel.app](https://voxpilot-two.vercel.app).
+2. **Configure Backend**: Enter target backend host in the navbar (e.g., `localhost:8000` or Render domain) and click **Start Session**.
+3. **Voice Input**: Hold **Hold to Speak** to record PCM16 audio from your microphone.
+4. **Speech-To-Text**: Binary PCM audio frames stream over WebSockets to the backend for STT transcription (Whisper / Deepgram).
+5. **Agent Routing & Execution**: `VoiceRouterAgent` routes the query to specialized domain agents (Task, Knowledge, Support, or General); executes safe AST tools or RAG retrieval when needed.
+6. **LLM & Audio Synthesis**: `gpt-4o-mini` streams token responses to OpenAI TTS (`tts-1`), streaming binary PCM audio frames prepended with an `AUDI` header back to the browser.
+7. **Playback & Waveform**: The Web Audio API schedules seamless `AudioBuffer` speaker playback while an `AnalyserNode` drives the real-time canvas visualizer.
+8. **Barge-In / Interruption**: Click **Barge-In** while AI is speaking to flush audio queues and reset state.
+9. **Knowledge Ingestion**: Ingest custom text documents via the RAG panel (`POST /api/v1/knowledge/ingest`) and query them immediately.
+10. **Session Replay Trace**: Open Dev Console or query `GET /api/v1/sessions/{id}/replay` to inspect the timestamped event timeline telemetry.
 
 ---
 
 ## ✨ Core Platform Capabilities
 
-| Feature | Description |
-|:--------|:------------|
-| 🤖 **Adaptive Model Router** | Cost-, latency-, and complexity-aware LLM selection (`gpt-4o-mini`, `claude-3-5-sonnet`, `gemini-1.5-flash`) with provider health monitoring (`HEALTHY`, `DEGRADED`, `UNAVAILABLE`) |
-| 🗣️ **Real-Time Voice Pipeline** | Full-duplex PCM16 binary WebSocket audio streaming (Browser Mic → STT → LLM → TTS → Speaker Playback) |
-| ⚡ **Barge-In & Interruption** | Low-latency speech boundary detection and instant audio queue flushing on user barge-in signals |
-| 📚 **Selective RAG Engine** | Vector document ingestion (`/api/v1/knowledge/ingest`), overlapping semantic chunking, and intelligent retrieval policy |
-| 🗣️ **Turn & Sentiment Engine** | Classifies turn states (`BACKCHANNEL`, `HESITATION`, `OVERLAP`) and user sentiment (`CALM`, `CONFUSED`, `FRUSTRATED`) to dynamically adjust response verbosity |
-| 🧠 **Long-Term Memory Store** | Captures persistent user facts, preferences, and entities across sessions with confidence scoring (`>= 0.70`) |
-| 🛡️ **Human-in-the-Loop Guard** | Categorizes tool execution risks (`LOW`, `MEDIUM`, `HIGH`, `BLOCKED`) with AST math safety and permission gates |
-| 📽️ **Session Replay & Telemetry** | Timestamped turn timeline logging (`/api/v1/sessions/{id}/replay`), per-request cost breakdown, and P50/P95 latency tracking |
-| 💾 **PostgreSQL & Memory Fallback** | Async SQLAlchemy engine (`sessions`, `messages`, `tool_calls`, `retrieval_events`) with automatic fallback to in-memory store |
-| 🧪 **Failure Recovery & Evals** | Chaos-tested under STT/TTS failures, LLM timeouts, and tool errors with automated benchmark suite (`POST /api/v1/evals/run`) |
+| Capability | Active Config | Supported Abstractions | Description |
+|:---|:---:|:---:|:---|
+| 🤖 **Adaptive Router** | `gpt-4o-mini` | OpenAI, Anthropic, Gemini, Mock | Dynamic routing based on query complexity and provider health (`HEALTHY`, `DEGRADED`, `UNAVAILABLE`) |
+| 🗣️ **Real-Time Voice** | OpenAI PCM16 | Whisper, Deepgram, OpenAI TTS, Cartesia, ElevenLabs | Full-duplex WebSocket binary audio frame streaming with `AUDI` header sample-rate parsing |
+| ⚡ **Barge-In Engine** | Active | Audio Queue Flushing | Low-latency speech boundary detection and instant audio queue flushing on barge-in signal |
+| 📚 **Selective RAG** | In-Memory Vector | OpenAI Embeddings, Custom Vector Store | Semantic text chunking, document indexing (`/api/v1/knowledge/ingest`), and query retrieval policy |
+| 🎭 **Turn & State Engine** | Active | Rule-Based Classifier | Turn state classification (`BACKCHANNEL`, `HESITATION`, `OVERLAP`) and user sentiment adaptation (`CALM`, `CONFUSED`, `FRUSTRATED`) |
+| 🧠 **Long-Term Memory** | Active | InMemory Fact Store | Persistent fact and entity extraction across turns with confidence scoring (`>= 0.70`) |
+| 🛡️ **Human-in-the-Loop** | Active | Safe AST Evaluator | Risk-classified tool execution (`LOW`, `MEDIUM`, `HIGH`, `BLOCKED`) with safe math evaluation without `eval()` |
+| 📽️ **Session Replay** | Active | Timeline Event Store | Timestamped event logging (`USER_SPEECH`, `STT_FINAL`, `AGENT_DECISION`, `TOOL_CALL`, `LLM_FIRST_TOKEN`, `TTS_FIRST_AUDIO`) |
+| 💾 **Persistence** | PostgreSQL / Memory | SQLAlchemy Async Engine + asyncpg | Schema auto-creation (`sessions`, `messages`, `tool_calls`, `retrieval_events`) with graceful fallback |
+| 🧪 **Reliability & Chaos** | Active | Fallback Engine & Circuit Breaker | System recovery under provider failures, LLM timeouts, STT/TTS errors, and tool exceptions |
 
 ---
 
@@ -49,7 +77,7 @@ long-term memory, Human-in-the-Loop safety, and full-stack observability.**
 flowchart TD
     Client["Client Browser (WebStudio UI / WebAudio API)"] -->|WebSocket PCM16 Audio / Control JSON| WSEndpoint["FastAPI WebSocket (/api/v1/voice/ws)"]
     WSEndpoint -->|Audio Chunk| VAD["Silero VAD / Speech Boundary Detector"]
-    VAD -->|Speech Segment| STT["STT Provider (Deepgram / Whisper / Mock)"]
+    VAD -->|Speech Segment| STT["STT Provider (Whisper / Deepgram / Mock)"]
     STT -->|Transcript| TurnMgr["Advanced Turn Manager"]
 
     TurnMgr -->|Turn Event| StateEngine["Conversational State Engine"]
@@ -67,7 +95,7 @@ flowchart TD
     RiskClassifier -->|HIGH / Unconfirmed| ConfirmationRequest["Confirmation Prompt to Client"]
 
     RAGEngine & ToolRegistry & LongTermMem -->|Assembled Context| LLM["LLM Provider (OpenAI / Anthropic / Gemini / Mock)"]
-    LLM -->|Streaming Tokens| TTS["TTS Provider (Cartesia / ElevenLabs / OpenAI / Mock)"]
+    LLM -->|Streaming Tokens| TTS["TTS Provider (OpenAI / Cartesia / ElevenLabs / Mock)"]
     TTS -->|PCM Audio Frames| WSEndpoint
 
     InterruptionMgr -.->|Barge-In Signal| LLM
@@ -83,7 +111,7 @@ flowchart TD
 
 ```
 voxpilot/
-├── agents/          # Multi-agent supervisor & router logic
+├── agents/          # Multi-agent supervisor & VoiceRouterAgent
 ├── api/             # FastAPI REST & WebSocket endpoints (/voice, /knowledge, /sessions, /evals, /health)
 ├── conversation/    # Conversational state engine & turn manager
 ├── db/              # Database layer (PostgreSQL async engine & in-memory fallback)
@@ -117,19 +145,19 @@ voxpilot/
 
 ---
 
-## ☁️ Production Deployment Architecture
+## ☁️ Deployment Architecture
 
-VoxPilot uses a decoupled production deployment model:
+VoxPilot uses a decoupled deployment model:
 
 ```text
 ┌────────────────────────────────┐         WebSocket (WSS)         ┌─────────────────────────────────┐
-│        Vercel Frontend         │ ──────────────────────────────> │      Render Cloud Backend       │
+│        Vercel Frontend         │ ──────────────────────────────> │   Render Backend (Configured)   │
 │  (voxpilot-two.vercel.app)     │ <────────────────────────────── │   (FastAPI + Docker Container)  │
 └────────────────────────────────┘                                 └─────────────────────────────────┘
 ```
 
-- **Frontend**: Hosted on Vercel ([https://voxpilot-two.vercel.app](https://voxpilot-two.vercel.app)) serving the Web Studio UI. Features an environment-aware **Host Selector** allowing 1-click connection to cloud backends or local development servers.
-- **Backend**: Containerized Python 3.11 FastAPI backend deployed via [render.yaml](render.yaml) & [Dockerfile.backend](Dockerfile.backend), supporting long-lived full-duplex `wss://` WebSocket audio streams.
+- **Frontend App**: Hosted live on Vercel ([https://voxpilot-two.vercel.app](https://voxpilot-two.vercel.app)) serving the Web Studio UI with dynamic navbar **Host Selector**.
+- **Backend Service**: Containerized Python 3.11 FastAPI backend configured for cloud deployment via [render.yaml](render.yaml) & [Dockerfile.backend](Dockerfile.backend).
 
 ---
 
@@ -144,7 +172,7 @@ cd voxpilot
 ### 2. Environment Setup
 ```bash
 cp .env.example .env
-# Fill in your API keys (e.g. OPENAI_API_KEY)
+# Configure keys if using real providers
 ```
 
 ### 3. Install Dependencies
@@ -152,20 +180,15 @@ cp .env.example .env
 uv sync --group dev
 ```
 
-### 4. Run VoxPilot Server
+### 4. Run VoxPilot Local Server
 ```bash
 uv run python -m voxpilot.api.server
 ```
 Open **`http://localhost:8000/app/`** to launch the Web Studio UI.
 
-### 5. Run Automated Test Suite (27/27 Tests)
+### 5. Run Automated Test Suite
 ```bash
 uv run pytest tests/voxpilot/ -v
-```
-
-### 6. Docker Deployment
-```bash
-docker-compose up --build -d
 ```
 
 ---
@@ -185,36 +208,6 @@ docker-compose up --build -d
 | `HOST` | `0.0.0.0` | Server host address |
 | `PORT` | `8000` | Server port |
 | `ENVIRONMENT` | `development` | Environment mode (`development` \| `production`) |
-
----
-
-## 🛠️ Tech Stack
-
-- **Runtime**: Python 3.12+ / 3.11
-- **Web Framework**: FastAPI + WebSockets (`uvicorn`)
-- **LLM Providers**: OpenAI (`gpt-4o-mini`), Anthropic (`claude-3-5-sonnet`), Google (`gemini-1.5-flash`)
-- **STT Providers**: Deepgram (`nova-2`), OpenAI Whisper (`whisper-1`)
-- **TTS Providers**: OpenAI (`tts-1` PCM streaming), Cartesia, ElevenLabs
-- **VAD**: Silero VAD
-- **Database & Persistence**: PostgreSQL (`SQLAlchemy` asyncpg) with in-memory fallback
-- **Package Manager**: `uv`
-- **Containerization**: Docker + Docker Compose
-- **Frontend**: Vanilla JS + Web Audio API + HTML5 Canvas (Web Studio UI)
-
----
-
-## 📚 Technical Documentation
-
-| Document | Description |
-|:---------|:------------|
-| 📋 [Implementation Verification Audit](docs/IMPLEMENTATION_VERIFICATION.md) | Comprehensive audit of all implemented features |
-| 🏗️ [Real Runtime Architecture](docs/REAL_RUNTIME_ARCHITECTURE.md) | Detailed architecture specification |
-| 🧱 [Dependency & Code Boundaries](docs/DEPENDENCY_BOUNDARIES.md) | Code boundary and dependency audit |
-| 📜 [Open Source Attribution](docs/OPEN_SOURCE_ATTRIBUTION.md) | Open source licensing & attribution |
-| ⚡ [Failure Recovery Matrix](docs/FAILURE_RECOVERY_MATRIX.md) | Chaos testing & failure recovery scenarios |
-| 🎯 [Portfolio Overview](docs/PORTFOLIO_OVERVIEW.md) | Portfolio overview & specification |
-| 🗺️ [Advanced Architecture Plan](docs/ADVANCED_ARCHITECTURE_PLAN.md) | Extended architecture plan |
-| 🔒 [Security Audit](docs/SECURITY_AUDIT.md) | Security specification & audit |
 
 ---
 
