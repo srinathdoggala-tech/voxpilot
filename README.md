@@ -3,15 +3,16 @@
 <div align="center">
 
 ![VoxPilot AI](https://img.shields.io/badge/VoxPilot-Voice%20AI%20Platform-6366F1?style=for-the-badge)
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-voxpilot--two.vercel.app-000000?style=for-the-badge&logo=vercel)](https://voxpilot-two.vercel.app/)
 ![Author](https://img.shields.io/badge/Author-Srinath%20Doggala-black?style=for-the-badge&logo=github)
 ![Python](https://img.shields.io/badge/Python-3.12+-blue?style=for-the-badge&logo=python)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.100+-009688?style=for-the-badge&logo=fastapi)
 ![License](https://img.shields.io/badge/License-BSD--2--Clause-green?style=for-the-badge)
 
-**An actively developed, real-time Voice AI Agent platform with adaptive multi-model routing,
+**An enterprise real-time Voice AI Agent platform with adaptive multi-model routing,
 long-term memory, Human-in-the-Loop safety, and full-stack observability.**
 
-> **Development Status**: Provider integrations, WebSocket audio streaming, microphone capture, and PostgreSQL persistence are actively being implemented milestone-by-milestone. The architecture, pipeline orchestration, observability, and reliability layers are fully structured and functional with configurable real or mock providers.
+> 🚀 **Live Production App**: Try VoxPilot Web Studio live at **[https://voxpilot-two.vercel.app](https://voxpilot-two.vercel.app)**
 
 *Designed and engineered by [Srinath Doggala](https://github.com/srinathdoggala-tech)*
 
