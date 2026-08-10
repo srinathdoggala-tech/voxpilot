@@ -12,7 +12,7 @@
 
 **A real-time Voice AI Agent platform with multi-agent orchestration, selective RAG, deterministic tool calling, reliability controls, and full-stack observability.**
 
-> 🚀 **Live Frontend Deployment**: Try VoxPilot Web Studio live at **[https://voxpilot-two.vercel.app](https://voxpilot-two.vercel.app)**
+> 🚀 **Live Frontend App**: Try VoxPilot Web Studio live at **[https://voxpilot-two.vercel.app](https://voxpilot-two.vercel.app)**
 
 *Designed and engineered by [Srinath Doggala](https://github.com/srinathdoggala-tech)*
 
@@ -20,14 +20,79 @@
 
 ---
 
+## 👨‍💻 What I Built
+
+**VoxPilot AI** was developed as a full-stack AI systems project rather than a simple wrapper around an LLM API. 
+
+I engineered the provider abstractions, multi-agent supervisor, intent router, selective RAG pipeline, tool safety layer, reliability mechanisms, persistence layer, telemetry APIs, WebSocket audio transport, and browser-based voice interface.
+
+The project focuses specifically on the real engineering challenges that emerge when LLMs are integrated into production applications: **unreliable third-party providers, malformed model outputs, audio latency, state management, tool execution safety, persistence, and evidence-based debugging.**
+
+---
+
+## 🧩 Engineering Highlights
+
+- **Async Backend**: FastAPI services built on asynchronous execution for provider, database, and audio processing tasks.
+- **Real-Time Transport**: Full-duplex WebSocket communication streaming binary PCM16 audio frames (`AUDI` header) and JSON control events.
+- **AI Orchestration**: Multi-agent supervision, dynamic intent routing, tool execution, and selective RAG.
+- **Reliability Controls**: Provider health monitoring (`HEALTHY`, `DEGRADED`, `UNAVAILABLE`), timeouts, circuit breakers, and fallback provider failover.
+- **Deterministic Execution**: Tool arguments and risk tiers (`LOW`, `MEDIUM`, `HIGH`, `BLOCKED`) are validated and safety-checked before execution.
+- **Persistence**: Async PostgreSQL schema via SQLAlchemy with an automatic in-memory fallback for zero-dependency local development.
+- **Observability**: Session event replay timeline (`/api/v1/sessions/{id}/replay`), latency measurement (STT, TTFT, TTFA, E2E), provider telemetry, and per-turn cost tracking.
+- **Automated Testing**: 27 automated tests covering APIs, agents, RAG, providers, tools, failure injection, and reliability.
+
+---
+
+## 🧠 Engineering Principles
+
+### LLM for Reasoning, Code for Control
+Large Language Models are used strictly for language understanding, intent extraction, knowledge synthesis, and natural conversational generation. Deterministic application code remains strictly responsible for input validation, risk classification, safety checks, routing, database persistence, and execution bounds (*"LLM as witness, code as judge"*).
+
+### Fail Closed
+Provider failures, malformed tool arguments, network timeouts, and unavailable database connections are handled explicitly with fallback mechanisms and controlled response generation rather than allowing undefined exceptions to propagate through the voice pipeline.
+
+### Provider Independence
+LLM, STT, and TTS providers are isolated behind abstract interface classes (`LLMProvider`, `STTProvider`, `TTSProvider`). The system can switch providers dynamically or trigger fallback failover without breaking pipeline contracts.
+
+### Observable by Default
+Every session logs structured turn events, latency breakdowns (STT, TTFT, TTFA, E2E), provider health states, tool execution arguments, and retrieval events so that system issues can be diagnosed from concrete empirical logs rather than model outputs alone.
+
+---
+
 ## 📊 Current Status & Verification
 
 - **27/27 Automated Tests Passing**: Fully verified test suite covering pipeline, routing, RAG, tools, failure recovery, circuit breakers, and APIs (`uv run pytest tests/voxpilot/ -v`).
 - **Live Frontend**: Static Web Studio UI deployed on Vercel at [https://voxpilot-two.vercel.app](https://voxpilot-two.vercel.app).
-- **FastAPI Backend**: Fully containerized via [Dockerfile.backend](Dockerfile.backend) and configured for 1-click cloud deployment via [render.yaml](render.yaml).
-- **Active Demo Configuration**: Powered by real OpenAI providers (`gpt-4o-mini`, `whisper-1`, `tts-1`) with configurable fallbacks to mock providers when API keys are omitted.
+- **FastAPI Backend**: Fully containerized via [Dockerfile.backend](Dockerfile.backend) and configured for cloud deployment via [render.yaml](render.yaml).
+- **Active Demo Configuration**: Powered by real OpenAI providers (`gpt-4o-mini`, `whisper-1`, `tts-1`) with automatic fallback to mock providers when API keys are omitted.
 - **Persistence & Fallback**: Async PostgreSQL schema (`sessions`, `messages`, `tool_calls`, `retrieval_events`) with non-fatal initialization and automatic in-memory fallback.
 - **Full Telemetry**: Per-turn cost tracking, STT/TTFT/TTFA latency metrics, and timestamped session event replay API (`/api/v1/sessions/{id}/replay`).
+
+---
+
+## 🧪 Testing & Reliability
+
+VoxPilot currently has **27 automated tests** covering:
+
+| Area | Coverage |
+|:---|:---|
+| **Agent Routing** | Intent classification (`task`, `knowledge`, `support`, `general`) and supervisor dispatch |
+| **API Endpoints** | Health check, knowledge ingestion/listing, sessions, session replay, evaluations |
+| **Voice Pipeline** | WebSocket session initialization, text turn processing, and audio frame construction |
+| **RAG System** | Document chunking, vector embedding, in-memory store indexing, and retrieval policies |
+| **Providers** | Mock and real LLM, STT, TTS, and embedding provider contracts |
+| **Failure Handling** | LLM timeouts, malformed tool arguments, and provider health degradation |
+| **Reliability** | Circuit breaker state tripping (`CLOSED` → `OPEN`), recovery timeouts, and provider failover |
+| **Tools & Safety** | Safe AST math evaluator, risk classifier, parameter schema validation |
+| **Memory & Turn State** | Session memory windowing, long-term memory injection, and prompt assembly |
+
+```bash
+uv run pytest tests/voxpilot/ -v
+```
+
+```text
+====================================== 27 passed in 7.92s ======================================
+```
 
 ---
 
@@ -42,7 +107,7 @@
 ```
 
 1. **Launch Web Studio**: Open [https://voxpilot-two.vercel.app](https://voxpilot-two.vercel.app).
-2. **Configure Backend**: Enter target backend host in the navbar (e.g., `localhost:8000` or Render domain) and click **Start Session**.
+2. **Configure Backend**: Enter target backend host in navbar (e.g., `localhost:8000` or Render domain) and click **Start Session**.
 3. **Voice Input**: Hold **Hold to Speak** to record PCM16 audio from your microphone.
 4. **Speech-To-Text**: Binary PCM audio frames stream over WebSockets to the backend for STT transcription (Whisper / Deepgram).
 5. **Agent Routing & Execution**: `VoiceRouterAgent` routes the query to specialized domain agents (Task, Knowledge, Support, or General); executes safe AST tools or RAG retrieval when needed.
@@ -145,19 +210,22 @@ voxpilot/
 
 ---
 
-## ☁️ Deployment Architecture
+## 🚧 Production Boundary
 
-VoxPilot uses a decoupled deployment model:
+The frontend is publicly deployed on Vercel at [https://voxpilot-two.vercel.app](https://voxpilot-two.vercel.app).
 
-```text
-┌────────────────────────────────┐         WebSocket (WSS)         ┌─────────────────────────────────┐
-│        Vercel Frontend         │ ──────────────────────────────> │   Render Backend (Configured)   │
-│  (voxpilot-two.vercel.app)     │ <────────────────────────────── │   (FastAPI + Docker Container)  │
-└────────────────────────────────┘                                 └─────────────────────────────────┘
-```
+The FastAPI backend is fully containerized ([Dockerfile.backend](Dockerfile.backend)) and configured for cloud deployment through Render ([render.yaml](render.yaml)). Local end-to-end execution and streaming voice loops have been fully verified; a publicly accessible cloud backend requires deployment with configured provider API credentials.
 
-- **Frontend App**: Hosted live on Vercel ([https://voxpilot-two.vercel.app](https://voxpilot-two.vercel.app)) serving the Web Studio UI with dynamic navbar **Host Selector**.
-- **Backend Service**: Containerized Python 3.11 FastAPI backend configured for cloud deployment via [render.yaml](render.yaml) & [Dockerfile.backend](Dockerfile.backend).
+This distinction is intentional: implemented functionality, locally verified runtime execution, and cloud deployment targets are documented explicitly and transparently.
+
+---
+
+## ⚠️ Known Limitations
+
+- **Cloud Backend Configuration**: Cloud backend deployment requires setting `OPENAI_API_KEY` (and optional `DEEPGRAM_API_KEY`) in the host dashboard environment.
+- **Database Persistence**: PostgreSQL schema persistence requires setting a valid `DATABASE_URL`. Local development and lightweight demos operate seamlessly using the built-in in-memory fallback.
+- **Network Latency**: Voice response latency depends on external provider API latency (OpenAI / Deepgram / ElevenLabs) and client network stability.
+- **WebSocket Host Binding**: The static Vercel frontend requires a reachable backend host address (local server or cloud URL) in the navbar input field to establish live voice sessions.
 
 ---
 
