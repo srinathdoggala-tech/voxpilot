@@ -376,13 +376,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function stopAudioPlayback() {
         nextStartTime = 0;
         isPlaying = false;
-        if (audioContext) {
-            // Close and recreate to stop all queued audio immediately
-            audioContext.close();
-            audioContext = null;
-            analyserNode = null;
-            analyserData = null;
-        }
+        // Do not close AudioContext as it is shared with microphone recording and analyzer
     }
 
     // ─── Microphone Capture (Push-to-Talk) ────────────────────────────────────
@@ -399,10 +393,10 @@ document.addEventListener('DOMContentLoaded', () => {
         ensureAudioContext();
 
         try {
+            stopAudioPlayback();  // Stop any AI audio playing
+
             mediaStream = await navigator.mediaDevices.getUserMedia({
                 audio: {
-                    channelCount: 1,
-                    sampleRate: TARGET_SAMPLE_RATE,
                     echoCancellation: true,
                     noiseSuppression: true,
                     autoGainControl: true,
@@ -414,7 +408,6 @@ document.addEventListener('DOMContentLoaded', () => {
             micBtn.classList.add('recording');
             visualizerState.textContent = '🔴 Recording… release to send';
             setAgentState('Listening…', 'listening');
-            stopAudioPlayback();  // Stop any AI audio playing
 
             const sourceNode = audioContext.createMediaStreamSource(mediaStream);
 

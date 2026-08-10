@@ -51,6 +51,7 @@ class WhisperSTTProvider(STTProvider):
                 file=audio_file,
                 response_format="text",
                 language="en",
+                temperature=0.0,
             )
             transcript = str(response).strip()
             logger.debug(f"Whisper transcript: '{transcript}'")
