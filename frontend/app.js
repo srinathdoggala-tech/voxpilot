@@ -142,6 +142,18 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     drawWaveform();
 
+    const backendHostInput = document.getElementById('backendHostInput');
+
+    const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    const savedHost = localStorage.getItem('voxpilot_backend_host');
+    if (backendHostInput) {
+        if (savedHost) {
+            backendHostInput.value = savedHost;
+        } else if (!isLocal) {
+            backendHostInput.value = 'voxpilot-backend.onrender.com';
+        }
+    }
+
     // ─── Dev Console Toggle ───────────────────────────────────────────────────
     toggleDevMode.addEventListener('click', () => {
         devPanel.classList.toggle('hidden');
@@ -151,8 +163,15 @@ document.addEventListener('DOMContentLoaded', () => {
     startSessionBtn.addEventListener('click', startSession);
 
     function startSession() {
-        const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-        const host = window.location.host || 'localhost:8000';
+        let rawHost = (backendHostInput ? backendHostInput.value.trim() : '') || window.location.host || 'localhost:8000';
+        
+        // Strip protocol prefix if user pasted full URL
+        let host = rawHost.replace(/^(https?|wss?):\/\//i, '').replace(/\/.*$/, '');
+        localStorage.setItem('voxpilot_backend_host', host);
+        
+        const isHostLocal = host.startsWith('localhost') || host.startsWith('127.0.0.1');
+        const protocol = (window.location.protocol === 'https:' && !isHostLocal) ? 'wss:' : 'ws:';
+        
         const wsUrl = `${protocol}//${host}/api/v1/voice/ws`;
 
         ws = new WebSocket(wsUrl);

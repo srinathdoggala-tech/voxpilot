@@ -18,10 +18,10 @@ _SAFE_OPERATORS = {
 
 
 def _safe_eval_node(node):
-    if isinstance(node, ast.Num):
-        return node.n
-    elif isinstance(node, ast.Constant):
+    if isinstance(node, ast.Constant) and isinstance(node.value, (int, float)):
         return node.value
+    elif hasattr(ast, "Num") and isinstance(node, ast.Num):
+        return node.n
     elif isinstance(node, ast.BinOp):
         left = _safe_eval_node(node.left)
         right = _safe_eval_node(node.right)

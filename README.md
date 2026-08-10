@@ -108,6 +108,9 @@ voxpilot/
 | `/api/v1/voice/ws` | `WS` | Real-time full-duplex PCM audio streaming & conversation |
 | `/api/v1/health` | `GET` | System health check & active provider status |
 | `/api/v1/knowledge/ingest` | `POST` | Ingest knowledge documents into vector store for RAG |
+| `/api/v1/knowledge/list` | `GET` | List all ingested knowledge documents |
+| `/api/v1/sessions` | `GET` | List active & past voice sessions |
+| `/api/v1/sessions/{id}/replay` | `GET` | Retrieve timestamped event timeline for session replay |
 | `/api/v1/evals/run` | `POST` | Trigger Model Evaluation Arena & benchmark suite |
 | `/app/` | `HTTP` | Web Studio UI & Developer Telemetry Console |
 

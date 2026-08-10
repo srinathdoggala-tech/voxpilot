@@ -1,6 +1,15 @@
 {
   "version": 2,
-  "buildCommand": null,
-  "outputDirectory": "frontend",
-  "cleanUrls": true
+  "builds": [
+    {
+      "src": "frontend/**/*",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/frontend/$1"
+    }
+  ]
 }
