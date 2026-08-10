@@ -22,7 +22,7 @@ long-term memory, Human-in-the-Loop safety, and full-stack observability.**
 
 ## 🌟 What is VoxPilot?
 
-**VoxPilot AI** is an advanced, production-grade real-time Voice AI Agent platform. It combines low-latency voice pipeline orchestration with intelligent multi-model routing, persistent user memory, real-time sentiment adaptation, and comprehensive observability — all accessible through a single WebSocket interface.
+**VoxPilot AI** is an advanced, production-grade real-time Voice AI Agent platform. It combines low-latency voice pipeline orchestration with intelligent multi-model routing, persistent user memory, real-time sentiment adaptation, selective RAG knowledge retrieval, and comprehensive observability — all accessible through a single full-duplex WebSocket interface.
 
 ---
 
@@ -30,16 +30,16 @@ long-term memory, Human-in-the-Loop safety, and full-stack observability.**
 
 | Feature | Description |
 |:--------|:------------|
-| 🤖 **Adaptive Model Router** | Cost-, latency-, and complexity-aware LLM selection (`gpt-4o-mini`, `claude-3-5-sonnet`, `gemini-1.5-flash`) with provider health checks (`HEALTHY`, `DEGRADED`, `UNAVAILABLE`) |
-| 🗣️ **Advanced Turn Manager** | Classifies turn states (`BACKCHANNEL`, `HESITATION`, `OVERLAP`, `SILENCE_TIMEOUT`) and filters backchannels without interrupting audio playback |
-| 🎭 **Conversational State Engine** | Derives user sentiment (`CALM`, `CONFUSED`, `FRUSTRATED`, `ENGAGED`, `RUSHING`) to dynamically adapt assistant response verbosity |
-| 🧠 **Long-Term Memory Store** | Captures persistent user facts, preferences, and entities across sessions with confidence thresholds (`>= 0.70`) |
-| ⏱️ **Task Scheduler** | Session-surviving background task scheduler with retries, timeouts, and cancellation |
-| 🛡️ **Human-in-the-Loop Guard** | Categorizes tool execution risks into `LOW`, `MEDIUM`, `HIGH`, `BLOCKED` with explicit user confirmation guards |
-| 📽️ **Session Replay Store** | Timestamped turn timeline logging (`USER_SPEECH`, `STT_FINAL`, `AGENT_DECISION`, `TOOL_CALL`, `LLM_FIRST_TOKEN`, `TTS_FIRST_AUDIO`, `USER_INTERRUPT`) |
-| 💰 **Real-Time Cost Engine** | Calculates estimated costs for LLM tokens, STT duration, TTS characters, and embeddings |
-| ⚔️ **Model Evaluation Arena** | Side-by-side multi-model benchmark comparisons evaluating quality, latency, cost, and tool correctness |
-| 🧪 **Failure Injection Testing** | Test suite verifying system recovery under STT failure, TTS failure, LLM timeout, empty RAG, tool timeout, and network disconnects |
+| 🤖 **Adaptive Model Router** | Cost-, latency-, and complexity-aware LLM selection (`gpt-4o-mini`, `claude-3-5-sonnet`, `gemini-1.5-flash`) with provider health monitoring (`HEALTHY`, `DEGRADED`, `UNAVAILABLE`) |
+| 🗣️ **Real-Time Voice Pipeline** | Full-duplex PCM16 binary WebSocket audio streaming (Browser Mic → STT → LLM → TTS → Speaker Playback) |
+| ⚡ **Barge-In & Interruption** | Low-latency speech boundary detection and instant audio queue flushing on user barge-in signals |
+| 📚 **Selective RAG Engine** | Vector document ingestion (`/api/v1/knowledge/ingest`), overlapping semantic chunking, and intelligent retrieval policy |
+| 🗣️ **Turn & Sentiment Engine** | Classifies turn states (`BACKCHANNEL`, `HESITATION`, `OVERLAP`) and user sentiment (`CALM`, `CONFUSED`, `FRUSTRATED`) to dynamically adjust response verbosity |
+| 🧠 **Long-Term Memory Store** | Captures persistent user facts, preferences, and entities across sessions with confidence scoring (`>= 0.70`) |
+| 🛡️ **Human-in-the-Loop Guard** | Categorizes tool execution risks (`LOW`, `MEDIUM`, `HIGH`, `BLOCKED`) with AST math safety and permission gates |
+| 📽️ **Session Replay & Telemetry** | Timestamped turn timeline logging (`/api/v1/sessions/{id}/replay`), per-request cost breakdown, and P50/P95 latency tracking |
+| 💾 **PostgreSQL & Memory Fallback** | Async SQLAlchemy engine (`sessions`, `messages`, `tool_calls`, `retrieval_events`) with automatic fallback to in-memory store |
+| 🧪 **Failure Recovery & Evals** | Chaos-tested under STT/TTS failures, LLM timeouts, and tool errors with automated benchmark suite (`POST /api/v1/evals/run`) |
 
 ---
 
@@ -74,7 +74,7 @@ flowchart TD
     InterruptionMgr -.->|Flush Audio Queue| TTS
 
     LLM & STT & TTS -->|Telemetry| LatencyObs["Latency Observer & Session Replay Store"]
-    LLM & STT & TTS -->|Usage| CostEngine["Cost Engine & Voice Quality Engine"]
+    LLM & STT & TTS -->|Usage| CostEngine["Cost Engine & Database Manager"]
 ```
 
 ---
@@ -83,21 +83,21 @@ flowchart TD
 
 ```
 voxpilot/
-├── agents/          # Multi-agent supervisor logic
-├── api/             # FastAPI server & WebSocket endpoints
+├── agents/          # Multi-agent supervisor & router logic
+├── api/             # FastAPI REST & WebSocket endpoints (/voice, /knowledge, /sessions, /evals, /health)
 ├── conversation/    # Conversational state engine & turn manager
-├── db/              # Database layer
-├── evals/           # Model evaluation arena & benchmark suite
-├── memory/          # Long-term memory store
-├── observability/   # Latency observer, cost engine, session replay
-├── pipeline/        # Core frame-based processing pipeline
-├── providers/       # LLM, STT, TTS provider abstractions
-├── rag/             # Selective RAG engine
-├── reliability/     # Failure injection & recovery testing
-├── security/        # Risk classifier & Human-in-the-Loop
+├── db/              # Database layer (PostgreSQL async engine & in-memory fallback)
+├── evals/           # Model evaluation arena & benchmark scenarios
+├── memory/          # Long-term memory store & fact extraction
+├── observability/   # Latency observer, cost engine, session replay timeline
+├── pipeline/        # Frame-based processing pipeline & turn result builder
+├── providers/       # LLM (OpenAI/Anthropic/Gemini), STT (Deepgram/Whisper), TTS (OpenAI/ElevenLabs/Cartesia)
+├── rag/             # Selective RAG engine (document chunking & vector search)
+├── reliability/     # Circuit breaker, fallback engine & failure recovery
+├── security/        # Risk classifier & Human-in-the-Loop safety
 ├── tasks/           # Background task scheduler
-├── tools/           # Safe tool registry
-└── config.py        # Platform configuration
+├── tools/           # Safe tool registry & safe AST calculator
+└── config.py        # Pydantic platform configuration settings
 ```
 
 ---
@@ -117,6 +117,22 @@ voxpilot/
 
 ---
 
+## ☁️ Production Deployment Architecture
+
+VoxPilot uses a decoupled production deployment model:
+
+```text
+┌────────────────────────────────┐         WebSocket (WSS)         ┌─────────────────────────────────┐
+│        Vercel Frontend         │ ──────────────────────────────> │      Render Cloud Backend       │
+│  (voxpilot-two.vercel.app)     │ <────────────────────────────── │   (FastAPI + Docker Container)  │
+└────────────────────────────────┘                                 └─────────────────────────────────┘
+```
+
+- **Frontend**: Hosted on Vercel ([https://voxpilot-two.vercel.app](https://voxpilot-two.vercel.app)) serving the Web Studio UI. Features an environment-aware **Host Selector** allowing 1-click connection to cloud backends or local development servers.
+- **Backend**: Containerized Python 3.11 FastAPI backend deployed via [render.yaml](render.yaml) & [Dockerfile.backend](Dockerfile.backend), supporting long-lived full-duplex `wss://` WebSocket audio streams.
+
+---
+
 ## 🚀 Quick Start
 
 ### 1. Clone the Repository
@@ -128,7 +144,7 @@ cd voxpilot
 ### 2. Environment Setup
 ```bash
 cp .env.example .env
-# Fill in your API keys
+# Fill in your API keys (e.g. OPENAI_API_KEY)
 ```
 
 ### 3. Install Dependencies
@@ -142,14 +158,9 @@ uv run python -m voxpilot.api.server
 ```
 Open **`http://localhost:8000/app/`** to launch the Web Studio UI.
 
-### 5. Run Test Suite
+### 5. Run Automated Test Suite (27/27 Tests)
 ```bash
-# Windows PowerShell
-$env:PYTHONPATH="."
 uv run pytest tests/voxpilot/ -v
-
-# macOS / Linux
-PYTHONPATH=. uv run pytest tests/voxpilot/ -v
 ```
 
 ### 6. Docker Deployment
@@ -161,28 +172,34 @@ docker-compose up --build -d
 
 ## 🔑 Environment Variables
 
-| Variable | Description |
-|:---------|:------------|
-| `OPENAI_API_KEY` | OpenAI API key (GPT-4o, Whisper, TTS) |
-| `ANTHROPIC_API_KEY` | Anthropic API key (Claude) |
-| `GOOGLE_API_KEY` | Google API key (Gemini) |
-| `DEEPGRAM_API_KEY` | Deepgram API key (STT) |
-| `CARTESIA_API_KEY` | Cartesia API key (TTS) |
-| `ELEVENLABS_API_KEY` | ElevenLabs API key (TTS) |
+| Variable | Default | Description |
+|:---------|:-------:|:------------|
+| `OPENAI_API_KEY` | — | OpenAI API key (GPT-4o-mini, Whisper, OpenAI TTS) |
+| `DEEPGRAM_API_KEY` | — | Deepgram API key (Nova-2 low-latency STT) |
+| `ANTHROPIC_API_KEY` | — | Anthropic API key (Claude 3.5 Sonnet) |
+| `GEMINI_API_KEY` | — | Google Gemini API key (Gemini 1.5 Flash) |
+| `LLM_PROVIDER` | `mock` | Selected LLM provider (`mock` \| `openai` \| `anthropic` \| `gemini`) |
+| `STT_PROVIDER` | `mock` | Selected STT provider (`mock` \| `deepgram` \| `whisper`) |
+| `TTS_PROVIDER` | `mock` | Selected TTS provider (`mock` \| `openai` \| `cartesia` \| `elevenlabs`) |
+| `DATABASE_URL` | — | PostgreSQL async connection URL (`postgresql+asyncpg://...`) |
+| `HOST` | `0.0.0.0` | Server host address |
+| `PORT` | `8000` | Server port |
+| `ENVIRONMENT` | `development` | Environment mode (`development` \| `production`) |
 
 ---
 
 ## 🛠️ Tech Stack
 
-- **Runtime**: Python 3.12+
-- **Web Framework**: FastAPI + WebSockets
-- **LLM Providers**: OpenAI, Anthropic (Claude), Google (Gemini)
-- **STT Providers**: Deepgram, OpenAI Whisper
-- **TTS Providers**: Cartesia, ElevenLabs, OpenAI
+- **Runtime**: Python 3.12+ / 3.11
+- **Web Framework**: FastAPI + WebSockets (`uvicorn`)
+- **LLM Providers**: OpenAI (`gpt-4o-mini`), Anthropic (`claude-3-5-sonnet`), Google (`gemini-1.5-flash`)
+- **STT Providers**: Deepgram (`nova-2`), OpenAI Whisper (`whisper-1`)
+- **TTS Providers**: OpenAI (`tts-1` PCM streaming), Cartesia, ElevenLabs
 - **VAD**: Silero VAD
-- **Package Manager**: uv
+- **Database & Persistence**: PostgreSQL (`SQLAlchemy` asyncpg) with in-memory fallback
+- **Package Manager**: `uv`
 - **Containerization**: Docker + Docker Compose
-- **Frontend**: Vanilla JS + Web Audio API (Web Studio UI)
+- **Frontend**: Vanilla JS + Web Audio API + HTML5 Canvas (Web Studio UI)
 
 ---
 
