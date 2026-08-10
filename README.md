@@ -8,8 +8,10 @@
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.100+-009688?style=for-the-badge&logo=fastapi)
 ![License](https://img.shields.io/badge/License-BSD--2--Clause-green?style=for-the-badge)
 
-**A production-grade, real-time Voice AI Agent platform with adaptive multi-model routing,  
+**An actively developed, real-time Voice AI Agent platform with adaptive multi-model routing,
 long-term memory, Human-in-the-Loop safety, and full-stack observability.**
+
+> **Development Status**: Provider integrations, WebSocket audio streaming, microphone capture, and PostgreSQL persistence are actively being implemented milestone-by-milestone. The architecture, pipeline orchestration, observability, and reliability layers are fully structured and functional with configurable real or mock providers.
 
 *Designed and engineered by [Srinath Doggala](https://github.com/srinathdoggala-tech)*
 
@@ -176,7 +178,7 @@ docker-compose up --build -d
 - **VAD**: Silero VAD
 - **Package Manager**: uv
 - **Containerization**: Docker + Docker Compose
-- **Frontend**: React (Web Studio UI)
+- **Frontend**: Vanilla JS + Web Audio API (Web Studio UI)
 
 ---
 

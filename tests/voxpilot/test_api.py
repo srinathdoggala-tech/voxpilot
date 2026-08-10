@@ -25,11 +25,24 @@ def test_knowledge_ingest_endpoint():
     assert data["chunks_created"] > 0
 
 
+def test_knowledge_list_endpoint():
+    response = client.get("/api/v1/knowledge/list")
+    assert response.status_code == 200
+    data = response.json()
+    assert "documents" in data
+
+
 def test_evals_run_endpoint():
     response = client.post("/api/v1/evals/run")
     assert response.status_code == 200
     data = response.json()
     assert data["total_scenarios"] > 0
+
+
+def test_sessions_endpoint():
+    response = client.get("/api/v1/sessions")
+    assert response.status_code == 200
+    assert isinstance(response.json(), list)
 
 
 def test_voice_websocket_endpoint():
@@ -39,6 +52,11 @@ def test_voice_websocket_endpoint():
 
         # Send text turn
         websocket.send_json({"type": "text_turn", "text": "Hello VoxPilot"})
+        
+        # Read messages until turn_complete
         resp = websocket.receive_json()
+        while resp.get("type") == "processing":
+            resp = websocket.receive_json()
+
         assert resp["type"] == "turn_complete"
         assert resp["assistant_text"] != ""

@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VoxPilot AI — Voice Agent Platform by Srinath Doggala</title>
+    <title>VoxPilot AI — Real-Time Voice Agent Platform by Srinath Doggala</title>
+    <meta name="description" content="VoxPilot AI is a real-time voice agent platform with adaptive LLM routing, RAG, memory, and full observability. Built by Srinath Doggala.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -15,7 +16,7 @@
         <header class="navbar glass">
             <div class="brand">
                 <div class="logo-icon">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 18C8.69 18 6 15.31 6 12C6 8.69 8.69 6 12 6C15.31 6 18 8.69 18 12C18 15.31 15.31 18 12 18Z" fill="url(#grad1)"/>
                         <circle cx="12" cy="12" r="4" fill="url(#grad2)"/>
                         <defs>
@@ -37,13 +38,18 @@
             </div>
 
             <div class="nav-controls">
+                <div class="provider-badges" id="providerBadges" style="display:none;">
+                    <span class="provider-badge" id="llmBadge">LLM: —</span>
+                    <span class="provider-badge" id="sttBadge">STT: —</span>
+                    <span class="provider-badge" id="ttsBadge">TTS: —</span>
+                </div>
                 <div class="status-indicator" id="statusIndicator">
-                    <span class="status-dot"></span>
+                    <span class="status-dot" id="statusDot"></span>
                     <span class="status-text" id="statusText">Disconnected</span>
                 </div>
                 <button id="toggleDevMode" class="btn btn-secondary">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 16L22 12L18 8M6 8L2 12L6 16M14 4L10 20"/></svg>
-                    Developer Console
+                    Dev Console
                 </button>
             </div>
         </header>
@@ -59,25 +65,40 @@
 
                 <!-- Real-Time Waveform Visualizer Canvas -->
                 <div class="visualizer-container">
-                    <canvas id="waveCanvas" width="700" height="160"></canvas>
+                    <canvas id="waveCanvas" width="700" height="140"></canvas>
                     <div class="visualizer-overlay" id="visualizerState">
-                        Press "Start Session" to connect microphone audio
+                        Press "Start Session" to connect
                     </div>
+                </div>
+
+                <!-- Agent state indicator -->
+                <div class="agent-state-bar" id="agentStateBar" style="display:none;">
+                    <div class="state-indicator" id="stateIndicator">
+                        <span class="state-dot" id="stateDot"></span>
+                        <span id="stateLabel">Idle</span>
+                    </div>
+                    <span class="conv-state" id="convState">CALM</span>
                 </div>
 
                 <!-- Session Control Action Buttons -->
                 <div class="controls-panel">
-                    <button id="startSessionBtn" class="btn btn-primary btn-lg">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
+                    <button id="startSessionBtn" class="btn btn-primary btn-lg" aria-label="Start voice session">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
                         Start Session
                     </button>
-                    
-                    <button id="bargeInBtn" class="btn btn-warning btn-lg" disabled>
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 9v6m4-6v6M18 12a6 6 0 1 1-12 0 6 6 0 0 1 12 0z"/></svg>
-                        Barge-In / Interrupt
+
+                    <!-- Push-to-Talk Mic Button -->
+                    <button id="micBtn" class="btn btn-mic btn-lg" disabled aria-label="Hold to speak">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
+                        Hold to Speak
                     </button>
 
-                    <button id="endSessionBtn" class="btn btn-danger btn-lg" disabled>
+                    <button id="bargeInBtn" class="btn btn-warning btn-lg" disabled aria-label="Interrupt AI speech">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+                        Barge-In
+                    </button>
+
+                    <button id="endSessionBtn" class="btn btn-danger btn-lg" disabled aria-label="End voice session">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>
                         End Session
                     </button>
@@ -85,32 +106,43 @@
 
                 <!-- Text Fallback Input Box -->
                 <div class="text-input-row">
-                    <input type="text" id="textTurnInput" class="input-field" placeholder="Or type a message to send (e.g. 'Calculate 25 * 4' or 'What is our refund policy?')..." disabled>
-                    <button id="sendTextBtn" class="btn btn-secondary" disabled>Send Turn</button>
+                    <input type="text" id="textTurnInput" class="input-field" placeholder="Or type a message (e.g. 'What is your refund policy?')..." disabled aria-label="Type a message">
+                    <button id="sendTextBtn" class="btn btn-secondary" disabled aria-label="Send text message">Send</button>
                 </div>
+
+                <!-- Knowledge Ingest Panel -->
+                <details class="knowledge-panel glass-inner" id="knowledgePanel">
+                    <summary>📚 Ingest Knowledge Document</summary>
+                    <div class="knowledge-form">
+                        <input type="text" id="docTitle" class="input-field" placeholder="Document title...">
+                        <textarea id="docContent" class="input-field textarea-field" placeholder="Paste document content here..."></textarea>
+                        <button id="ingestDocBtn" class="btn btn-secondary" disabled>Ingest Document</button>
+                        <div id="ingestStatus" class="ingest-status"></div>
+                    </div>
+                </details>
             </section>
 
-            <!-- Right Side: Live Transcript Stream & Session Replay Timeline -->
+            <!-- Right Side: Live Transcript Stream -->
             <section class="transcript-panel glass">
                 <div class="panel-header">
-                    <h3>Conversation History & Session Replay</h3>
+                    <h3>Conversation History</h3>
                     <span class="count-badge" id="messageCount">0 messages</span>
                 </div>
 
-                <div class="transcript-stream" id="transcriptStream">
-                    <div class="empty-state">
+                <div class="transcript-stream" id="transcriptStream" role="log" aria-live="polite">
+                    <div class="empty-state" id="emptyState">
                         <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-                        <p>No active conversation turn recorded yet.</p>
+                        <p>No conversation yet. Start a session and speak or type.</p>
                     </div>
                 </div>
             </section>
         </main>
 
-        <!-- Advanced Developer Mode Telemetry & Session Replay Panel -->
-        <aside class="dev-panel glass hidden" id="devPanel">
+        <!-- Developer Mode Panel -->
+        <aside class="dev-panel glass hidden" id="devPanel" aria-label="Developer telemetry console">
             <div class="panel-header">
                 <h3>Developer Console & AI Telemetry</h3>
-                <span class="sub-label">Adaptive Router, Cost Engine & Session Replay</span>
+                <span class="sub-label">Adaptive Router · Cost Engine · Session Replay</span>
             </div>
 
             <div class="metrics-grid">
@@ -135,16 +167,24 @@
                     <span class="metric-value" id="turnCostVal">$0.0000</span>
                 </div>
                 <div class="metric-card">
-                    <span class="metric-label">State</span>
+                    <span class="metric-label">Conv. State</span>
                     <span class="metric-value" id="stateVal" style="font-size:0.95rem; color:#10B981;">CALM</span>
                 </div>
             </div>
 
+            <!-- Session Timeline -->
+            <div class="timeline-section">
+                <h4>Session Event Timeline</h4>
+                <div class="timeline" id="sessionTimeline">
+                    <div class="timeline-empty">No events yet.</div>
+                </div>
+            </div>
+
             <div class="eval-section">
-                <h4>Model Arena & Evaluations</h4>
+                <h4>Evaluations & Benchmark Arena</h4>
                 <div style="display:flex; gap:10px; margin-top:8px;">
                     <button id="runEvalsBtn" class="btn btn-secondary" style="flex:1;">Run Evals</button>
-                    <button id="runArenaBtn" class="btn btn-primary" style="flex:1;">Model Arena</button>
+                    <button id="runArenaBtn" class="btn btn-primary" style="flex:1;" disabled>Model Arena</button>
                 </div>
                 <div class="eval-results" id="evalResultsBox">Ready to execute benchmark evaluations.</div>
             </div>

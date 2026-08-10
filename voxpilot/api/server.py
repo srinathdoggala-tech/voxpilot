@@ -9,7 +9,7 @@ from fastapi.staticfiles import StaticFiles
 from voxpilot.config import settings
 from voxpilot.observability.logger import setup_logger
 from voxpilot.db.database import db_manager
-from voxpilot.api.v1 import health, knowledge, evals, voice
+from voxpilot.api.v1 import health, knowledge, evals, voice, sessions
 
 logger = setup_logger("voxpilot.server")
 
@@ -47,6 +47,7 @@ def create_app() -> FastAPI:
     app.include_router(knowledge.router)
     app.include_router(evals.router)
     app.include_router(voice.router)
+    app.include_router(sessions.router)
 
     # Mount static frontend directory if present
     frontend_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "frontend")
